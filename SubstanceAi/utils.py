@@ -2,9 +2,15 @@ import gridfs
 from pymongo import MongoClient
 
 # Connexion à MongoDB
-MONGO_URI = "mongodb://localhost:27017/SubstanceAi"
+# MONGO_URI = "mongodb://localhost:27017/SubstanceAi"
+# client = MongoClient(MONGO_URI)
+# db = client.get_database()
+
+MONGO_URI = "mongodb+srv://Substance:Collegue1%402026%23Mongo@cluster0.deh4w.mongodb.net/?appName=Cluster0"
+
 client = MongoClient(MONGO_URI)
-db = client.get_database()
+db = client["SubstanceAi"]
+
 users_collection = db["pdfs"]  # Collection MongoDB pour stocker les utilisateurs
 fs = gridfs.GridFS(db)
 
@@ -12,7 +18,9 @@ import gridfs
 from pymongo import MongoClient
 
 # Connexion à MongoDB
-client = MongoClient("mongodb://localhost:27017/")
+MONGO_URI = "mongodb+srv://Substance:Collegue1%402026%23Mongo@cluster0.deh4w.mongodb.net/?appName=Cluster0"
+
+client = MongoClient(MONGO_URI)
 db = client["SubstanceAi"]
 fs = gridfs.GridFS(db)
 

@@ -2,8 +2,12 @@ from corsheaders.defaults import default_headers
 
 from pathlib import Path
 from pymongo import MongoClient
+import os
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = 'django-insecure-(6=61d!kjg5sv135dd_icnq2q&94-aab1eqai(mxe&19kqb6fw'
 DEBUG = True
@@ -25,6 +29,7 @@ INSTALLED_APPS = [
     'social_django',
     'profilapp',
     'corsheaders',
+    'api',
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -100,11 +105,20 @@ DATABASES = {
 }
 
 # ✅ Connexion à MongoDB avec PyMongo
-MONGO_URI = "mongodb://localhost:27017/SubstanceAi"
+# MONGO_URI = "mongodb://localhost:27017/SubstanceAi"
+# client = MongoClient(MONGO_URI)
+# db = client.get_database()
+
+# ✅ Connexion à MongoDB Atlas
+MONGO_URI = "mongodb+srv://Substance:Collegue1%402026%23Mongo@cluster0.deh4w.mongodb.net/?appName=Cluster0"
+
 client = MongoClient(MONGO_URI)
-db = client.get_database()
+db = client["SubstanceAi"]
+
 # Key_API_Gemini
 GEMINI_API_KEY = "AIzaSyB3-V_bNuF2w4h7gG5cqxBAblZKeXtkwXY"
+
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
 #######################
 AUTH_PASSWORD_VALIDATORS = [

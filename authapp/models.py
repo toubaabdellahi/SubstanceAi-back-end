@@ -3,9 +3,16 @@ from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 # Connexion à MongoDB
-MONGO_URI = "mongodb://localhost:27017/SubstanceAi"
+# MONGO_URI = "mongodb://localhost:27017/SubstanceAi"
+# client = MongoClient(MONGO_URI)
+# db = client.get_database()
+
+# ✅ Connexion à MongoDB Atlas
+MONGO_URI = "mongodb+srv://Substance:Collegue1%402026%23Mongo@cluster0.deh4w.mongodb.net/?appName=Cluster0"
+
 client = MongoClient(MONGO_URI)
-db = client.get_database()
+db = client["SubstanceAi"]
+
 users_collection = db["users"]  # Collection MongoDB pour stocker les utilisateurs
 
 class UserManager:
