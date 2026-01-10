@@ -17,7 +17,6 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
-from api.views import AskAPIView
 from authapp import urls
 from profilapp import urls
 from .views import *
