@@ -101,7 +101,7 @@ def login(request):
 
 GOOGLE_CLIENT_ID = "76497721292-2fmahu68t6r2vaiupdmq6rbbtqsm3jq5.apps.googleusercontent.com"
 GOOGLE_CLIENT_SECRET = "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"
-REDIRECT_URI = "http://localhost:8000/api/auth/login/google/callback/"
+REDIRECT_URI = "https://substanceai-back-end.onrender.com/api/auth/login/google/callback/"
 
 
 def google_callback(request):
