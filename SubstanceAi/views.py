@@ -5,8 +5,7 @@ from .utils import *
 from pymongo import MongoClient
 from bson import ObjectId
 from gridfs import GridFS
-# from gradio_client import Client
-# import tempfile
+
 
 @csrf_exempt
 def upload_pdf(request):
@@ -76,30 +75,3 @@ def download_pdf(request, file_id):
 
 
 
-# @csrf_exempt
-# def send_to_rag(request):
-#     if request.method == 'POST' and request.FILES:
-#         pdf_file = request.FILES['file']
-#         question = request.POST.get('question', '')
-
-#         try:
-#             # Sauvegarde temporaire du fichier
-#             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-#                 for chunk in pdf_file.chunks():
-#                     tmp.write(chunk)
-#                 tmp_path = tmp.name
-
-#             # Appel du modèle Hugging Face avec gradio_client
-#             client = Client("https://ahlamm-rag-api-m.hf.space/--replicas/fd22w/")
-#             result = client.predict(
-#                 tmp_path,        # 📄 Upload PDF
-#                 question,        # ❓ Pose ta question
-#                 api_name="/predict"
-#             )
-
-#             return JsonResponse({"answer": result})
-
-#         except Exception as e:
-#             return JsonResponse({"error": str(e)}, status=500)
-
-#     return JsonResponse({"error": "Méthode non autorisée"}, status=405)
