@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     'social_django',
     'profilapp',
     'corsheaders',
-    'api',
+    
 ]
 
 AUTHENTICATION_BACKENDS = [
