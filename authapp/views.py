@@ -179,7 +179,7 @@ def google_callback(request):
     token = create_jwt_token(user)
     print("Token JWT généré :", token)
     # Redirige vers le front en passant le token dans l'URL (ou autre moyen sécurisé)
-    redirect_url = f"http://localhost:3000/google-auth-success?token={token}"
+    redirect_url = f"https://substance-ai-front-end.vercel.app/google-auth-success?token={token}"
     return redirect(redirect_url)
 
 
