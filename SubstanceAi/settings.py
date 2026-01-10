@@ -11,7 +11,13 @@ load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = 'django-insecure-(6=61d!kjg5sv135dd_icnq2q&94-aab1eqai(mxe&19kqb6fw'
 DEBUG = True
-ALLOWED_HOSTS = ["https://substanceai-back-end.onrender.com"]
+# ALLOWED_HOSTS = ["https://substanceai-back-end.onrender.com"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "substanceai-back-end.onrender.com",  # ton URL Render
+]
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
