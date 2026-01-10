@@ -11,7 +11,7 @@ load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = 'django-insecure-(6=61d!kjg5sv135dd_icnq2q&94-aab1eqai(mxe&19kqb6fw'
 DEBUG = True
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["https://substanceai-back-end.onrender.com"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -130,7 +130,8 @@ AUTH_PASSWORD_VALIDATORS = [
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  
+    "http://localhost:3000",
+    "https://substance-ai-front-end.vercel.app",
 ]
 CORS_ALLOW_HEADERS = list(default_headers) + [
     'content-type',
