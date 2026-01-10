@@ -31,7 +31,7 @@ urlpatterns = [
     path('api/auth/upload-pdf/',upload_pdf, name='upload_pdf'),
     path('api/auth/list-pdfs/<str:user_id>/',list_pdfs, name='list_pdfs'),
     path('api/auth/download_pdf/<str:file_id>/', download_pdf, name='download_pdf'),
-    path('api/rag-question/', send_to_rag, name='rag_question'),
+    # path('api/rag-question/', send_to_rag, name='rag_question'),
     # path('api/ask/', AskAPIView.as_view(), name='ask_question'),
 
 ]
