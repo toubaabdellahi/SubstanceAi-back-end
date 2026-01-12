@@ -49,14 +49,22 @@ def register(request):
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
         data = serializer.validated_data
-        # Utilisation du UserManager pour créer un utilisateur dans MongoDB
+
+        # Vérification avec User
+        if User.find_by_email(data['email']) or User.find_by_username(data['username']):
+            return Response({
+        "message": "Un compte avec cet email ou username existe déjà."
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+
+        # Création de l'utilisateur
         user = user_manager.create_user(
             email=data['email'],
             fullname=data['fullname'],
             username=data['username'],
             password=data['password'],
-                
         )
+
         token = create_jwt_token(user)
 
         return Response({
@@ -68,7 +76,6 @@ def register(request):
                 "_id": str(user['_id'])
             },
             "redirect_url": "http://localhost:3000/home"
-
         }, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
