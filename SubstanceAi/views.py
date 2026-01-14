@@ -1,11 +1,92 @@
+# from django.http import FileResponse, JsonResponse
+# from django.views.decorators.csrf import csrf_exempt
+# from bson import ObjectId
+# from .utils import *
+# from pymongo import MongoClient
+# from bson import ObjectId
+# from gridfs import GridFS
+
+
+# @csrf_exempt
+# def upload_pdf(request):
+#     if request.method == 'POST' and request.FILES:
+#         user_id = request.POST.get('user_id')
+#         message = request.POST.get('message', '')
+#         uploaded_file_ids = []
+
+#         try:
+#             files = request.FILES.getlist('file')
+#             for f in files:
+#                 file_id = save_pdf_to_mongodb(f, user_id, message)
+#                 uploaded_file_ids.append(str(file_id))
+
+#             return JsonResponse({
+#                 'message': 'Fichiers enregistrés avec succès',
+#                 'file_ids': uploaded_file_ids
+#             })
+
+#         except Exception as e:
+#             traceback.print_exc()  # pour debug dans la console
+#             return JsonResponse({'error': 'Erreur lors de l\'enregistrement', 'details': str(e)}, status=500)
+
+#     return JsonResponse({'error': 'Aucun fichier reçu'}, status=400)
+
+
+# def list_pdfs(request, user_id):
+#     """Retourne la liste des fichiers PDF uploadés par un utilisateur spécifique"""
+#     try:
+#         files = list_user_pdfs(user_id)
+#         return JsonResponse({"files": files})
+#     except Exception as e:
+#         return JsonResponse({'error': str(e)}, status=400)
+    
+    
+
+# def download_pdf(request, file_id):
+#     try:
+#         # Conversion de l'ID en ObjectId MongoDB
+#         file_id = ObjectId(file_id)
+#         print(f"Récupération du fichier avec ID: {file_id}")
+        
+#         # Connexion à MongoDB
+#         MONGO_URI = "mongodb://localhost:27017/SubstanceAi"
+#         client = MongoClient(MONGO_URI)
+#         db = client.get_database()
+
+#         fs = GridFS(db)
+        
+#         # Récupération du fichier
+#         file = fs.get(file_id)
+#         if not file:
+#             return JsonResponse({'error': 'Fichier non trouvé'}, status=404)
+        
+#         # Création de la réponse
+#         response = FileResponse(
+#             file,
+#             content_type='application/pdf',
+#             as_attachment=True,
+#             filename=file.filename
+#         )
+#         return response
+        
+#     except Exception as e:
+#         return JsonResponse({'error': str(e)}, status=400)
+
+
+
 from django.http import FileResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from fastapi import requests
+import httpx
+import requests
 from bson import ObjectId
 from .utils import *
 from pymongo import MongoClient
 from bson import ObjectId
 from gridfs import GridFS
-
+from gradio_client import Client
+import tempfile
+import json
 
 @csrf_exempt
 def upload_pdf(request):
@@ -75,3 +156,90 @@ def download_pdf(request, file_id):
 
 
 
+@csrf_exempt
+def send_to_rag(request):
+    if request.method == 'POST' and request.FILES:
+        pdf_file = request.FILES['file']
+        question = request.POST.get('question', '')
+
+        try:
+            # Sauvegarde temporaire du fichier
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+                for chunk in pdf_file.chunks():
+                    tmp.write(chunk)
+                tmp_path = tmp.name
+
+            # Appel du modèle Hugging Face avec gradio_client
+            client = Client("https://ahlamm-rag-api-m.hf.space/--replicas/fd22w/")
+            result = client.predict(
+                tmp_path,        # 📄 Upload PDF
+                question,        # ❓ Pose ta question
+                api_name="/predict"
+            )
+
+            return JsonResponse({"answer": result})
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Méthode non autorisée"}, status=405)
+
+
+RENDER_MODEL_URL = "https://substanceai-model.onrender.com/ask"
+
+
+
+
+@csrf_exempt
+def chat_model(request):
+    if request.method != 'POST':
+        return JsonResponse({'detail': 'Method not allowed'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        question = data.get('question', '')
+        chat_history = data.get('chat_history', [])
+        user_id = data.get('user_id')
+
+        # 1. RÉCUPÉRER LE FICHIER DANS GRIDFS
+        last_file = db['fs.files'].find_one(
+            {"user_id": str(user_id)}, 
+            sort=[("uploadDate", DESCENDING)]
+        )
+
+        if not last_file:
+            return JsonResponse({'detail': " Aucun PDF trouvé en base."}, status=400)
+
+        grid_out = fs.get(last_file['_id'])
+        file_content = grid_out.read()
+
+        # 2. INGESTION VERS RENDER
+        ingest_url = "https://substanceai-model.onrender.com/ingest"
+        files = {'files': (last_file['filename'], file_content, 'application/pdf')}
+        
+        # print(f"📤 Ingestion du fichier: {last_file['filename']}")
+        ingest_res = requests.post(ingest_url, files=files, timeout=60.0)
+        ingest_res.raise_for_status()
+
+        # 3. QUESTION VERS RENDER
+        payload = {
+            "question": question,
+            "chat_history": chat_history
+        }
+        
+        # print(f"🚀 Envoi de la question: {question}")
+        response = requests.post(RENDER_MODEL_URL, json=payload, timeout=90.0)
+        response.raise_for_status()
+        
+        # --- LA RÉPARATION EST ICI ---
+        result = response.json() # On définit la variable result ici
+        
+        # print("\n🤖 RÉPONSE REÇUE DE RENDER :")
+        # print(json.dumps(result, indent=2)) # Affiche proprement le JSON dans le terminal
+        # print("-" * 30)
+        
+        return JsonResponse(result, status=200)
+
+    except Exception as e:
+        # print(f"💥 ERREUR DÉTAILLÉE: {str(e)}")
+        return JsonResponse({'detail': f"Erreur: {str(e)}"}, status=500)
