@@ -84,7 +84,6 @@ from .utils import *
 from pymongo import MongoClient
 from bson import ObjectId
 from gridfs import GridFS
-from gradio_client import Client
 import tempfile
 import json
 
