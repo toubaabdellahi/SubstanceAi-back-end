@@ -15,7 +15,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "substanceai-back-end.onrender.com",  # ton URL Render
+    "substanceai-back-end.onrender.com", 
+    "substanceai-model.onrender.com" # ton URL Render
 ]
 
 
