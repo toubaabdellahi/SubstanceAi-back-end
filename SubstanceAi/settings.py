@@ -9,6 +9,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
 
+STATIC_URL = '/static/'
+
+# C'est cette ligne qui manque à ton projet :
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Optionnel : si tu as un dossier static à la racine de ton projet
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
 SECRET_KEY = 'django-insecure-(6=61d!kjg5sv135dd_icnq2q&94-aab1eqai(mxe&19kqb6fw'
 DEBUG = True
 # ALLOWED_HOSTS = ["https://substanceai-back-end.onrender.com"]
@@ -81,6 +91,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 
 ]
 
